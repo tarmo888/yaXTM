@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>yaXTM</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<meta name="description" content="yet another XHR Task Manager" />
+	<style type="text/css">
+	* {-webkit-tap-highlight-color: rgba(0, 0, 0, 0);}
+	html, body {height: 100%;margin:0px;}
+	#wrapper {min-height: 100%;height: auto !important;height: 100%;margin: 0 10px -20px;}
+	#footer {height: 20px;margin-left:10px;}
+	body {font: normal 14px/1.5em Georgia,Times,serif;}
+	a {color:gray;text-decoration:none;}
+	a:hover {text-decoration:underline;}
+	textarea {width:280px;height:100px;}
+	input, select {width:280px;}
+	input[type=radio] {width:24px;}
+	input[type=datetime-local] {width:200px;}
+	label {cursor:pointer;cursor:hand;}
+	.task_row {margin-bottom:10px;}
+	.list_item {padding:5px;border-top:1px dotted silver;cursor:pointer;cursor:hand;}
+	.list_title {float:left;font-size:18px;}
+	.list_deadline {text-align:right;}
+	.high {color:red;}
+	.low {color:silver;}
+	#menu_bar, .menu_bar {font-size:20px;font-weight:bold;line-height:24px;color:white;text-align:center;background-color:silver;margin-left:-10px;margin-right:-10px;cursor:pointer;cursor:hand;}
+	#menu_left {float:left;}
+	#menu_right {text-align:right;}
+	</style>
+	<script type="text/javascript" src="ui.js"></script>
+</head>
+<body>
+<div id="wrapper">
+	<div id="task" style="display:none;">
+		<div class="menu_bar" onclick="history.go(-1);">click to go back</div>
+		<form action="#task_list" method="post" novalidate="novalidate" onsubmit="postTask();return false;">
+		<div class="task_row">
+			<label for="task_title">Title:</label><br />
+			<input type="text" id="task_title" name="task_title" />
+		</div>
+		<div class="task_row">
+			<label for="task_description">Description:</label><br />
+			<textarea id="task_description" name="task_description"></textarea>
+		</div>
+		<div class="task_row">
+			<label for="task_categories">Categories:</label><br />
+			<select id="task_categories" name="task_categories" size="5" multiple="multiple"></select>
+		</div>
+		<div class="task_row">
+			Priority:&nbsp;
+			<input type="radio" id="priority_high" name="priority" value="high" /><label for="priority_high">High</label>
+			<input type="radio" id="priority_normal" name="priority" value="normal" checked="checked" /><label for="priority_normal">Normal</label>
+			<input type="radio" id="priority_low" name="priority" value="low" /><label for="priority_low">Low</label>
+		</div>
+		<div class="task_row">
+			<label for="task_deadline">Deadline:</label>&nbsp;
+			<input type="datetime-local" id="task_deadline" name="task_deadline" value="" title="example: tomorrow, +1 week, next Monday" placeholder="tomorrow" />
+		</div>
+		<div class="task_row">
+			Deleted?:&nbsp;
+			<input type="radio" id="task_status_0" name="task_status" value="no" /><label for="task_status_0">No</label>
+			<input type="radio" id="task_status_1" name="task_status" value="yes" /><label for="task_status_1">Yes</label>
+		</div>
+		<input type="hidden" id="task_id" name="task_id" />
+		<input type="submit" id="save_task" name="save_task" value="Save Task" />
+		</form>
+	</div>
+	<div id="category" style="display:none;">
+		<div class="menu_bar" onclick="history.go(-1);">click to go back</div>
+		<form action="#task_list" method="post" novalidate="novalidate" onsubmit="postCategory();return false;">
+		<div class="task_row">
+			<label for="category_name">Category:</label><br />
+			<input type="text" id="category_name" name="category_name" />
+		</div>
+		<div class="task_row">
+			Deleted?:&nbsp;
+			<input type="radio" id="category_status_0" name="category_status" value="no" /><label for="category_status_0">No</label>
+			<input type="radio" id="category_status_1" name="category_status" value="yes" /><label for="category_status_1">Yes</label>
+		</div>
+		<input type="hidden" id="category_id" name="category_id" />
+		<input type="submit" id="save_category" name="save_category" value="Save Category" />
+		</form>
+	</div>
+	<div id="category_list" style="display:none;">
+		<div class="menu_bar" onclick="history.go(-1);">click to go back</div>
+		<div id="category_list_items"></div>
+	</div>
+	<div id="task_list">
+		<div id="menu" style="display:none;">
+			<div id="menu_left">
+				<div>
+					<label for="filter_categories">Categories:</label><br />
+					<select id="filter_categories" name="filter_categories" size="3" multiple="multiple" onchange="filterCatergories();"></select>
+				</div>
+				<div><strong>Filter: </strong><a href="#active">Active</a>, <a href="#over-deadline">Over Deadline</a>, <a href="#deleted">Deleted</a></div>
+				<div><strong>Sort by: </strong><a href="#sort-deadline">Deadline</a>, <a href="#sort-title">Title</a>, <a href="#sort-priority">Priority</a>, <a href="#sort-added">Added</a></div>
+				<div><strong>Sort order: </strong><a href="#sort-order-asc">Ascending</a>, <a href="#sort-order-desc">Descending</a></div>
+			</div>
+			<div id="menu_right">
+				<div>&nbsp;</div>
+				<a href="#task">Add New Task</a><br />
+				<a href="#category">Add New Category</a><br />
+				<a href="#category_list">Show All Categories</a><br />
+			</div>
+			<div style="clear:both;">&nbsp;</div>
+		</div>
+		<div id="menu_bar" onclick="openMenu();">click to open menu</div>
+		<div id="task_list_items">Loading...</div>
+	</div>
+	<div>&nbsp;</div>
+	<div>&nbsp;</div>
+</div>
+<div id="footer" style="display:none;">
+	yaXTM
+</div>
+<script>
+	if (document.URL.substring(0, 8) != 'file:///') {
+		document.getElementById('footer').style.display = '';
+	}
+	window.location.replace('#task_list');
+	window.onhashchange = hashHandler;
+	var base_url = '';
+	var list_categories = '';
+	var list_filter = 'active';
+	var list_sort = 'deadline';
+	var list_sort_order = 'asc';
+	var categories;
+	getTaskList();
+	getCategoryList();
+</script>
+</body>
+</html>
