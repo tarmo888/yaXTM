@@ -118,8 +118,6 @@
 	if (document.URL.substring(0, 8) != 'file:///') {
 		document.getElementById('footer').style.display = '';
 	}
-	window.location.replace('#task_list');
-	window.onhashchange = hashHandler;
 	var base_url = '';
 	var list_categories = '';
 	var list_filter = 'active';
@@ -128,6 +126,8 @@
 	var categories;
 	getTaskList();
 	getCategoryList();
+	hashHandler();
+	window.onhashchange = hashHandler;
 </script>
 </body>
 </html>
