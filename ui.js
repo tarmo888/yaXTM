@@ -1,4 +1,5 @@
 function openMenu() {
+	getCategoryList();
 	document.getElementById('menu').style.display = '';
 	document.getElementById('menu_bar').style.display = 'none';
 }
@@ -58,6 +59,7 @@ function hashHandler() {
 		openLayer('task_list');
 		break;
 	case 'task_list':
+		getTaskList();
 		openLayer('task_list');
 		break;
 	case 'task':
@@ -67,18 +69,7 @@ function hashHandler() {
 		document.getElementById('task_deadline').value = '';
 		document.getElementById('priority_normal').checked = true;
 		document.getElementById('task_status_0').checked = true;
-		clearSelect('task_categories');
-		for(category in categories) {
-			var new_option = document.createElement('option');
-			new_option.text = categories[category].category_name;
-			new_option.value = categories[category].category_id;
-			try {
-				document.getElementById('task_categories').add(new_option, null);
-			}
-			catch(ex) {
-				document.getElementById('task_categories').add(new_option);
-			}
-		}
+		getCategoryList();
 		openLayer('task');
 		break;
 	case 'category':
@@ -88,6 +79,7 @@ function hashHandler() {
 		openLayer('category');
 		break;
 	case 'category_list':
+		getCategoryList();
 		openLayer('category_list');
 		break;
 	default:
@@ -214,22 +206,22 @@ function loadTask(id) {
 			if (xmlhttp.status==200) {
 				//console.log(jsonParse(xmlhttp.responseText));
 				var data = jsonParse(xmlhttp.responseText).result;
-				document.getElementById('task_id').value = data.task_id;
-				document.getElementById('task_title').value = data.task_title;
-				document.getElementById('task_description').value = data.task_description;
-				document.getElementById('task_deadline').value = data.task_deadline;
-				document.getElementById('priority_'+data.task_priority).checked = true;
-				document.getElementById('task_status_'+data.task_status).checked = true;
+				document.getElementById('task_id').value = data.task.task_id;
+				document.getElementById('task_title').value = data.task.task_title;
+				document.getElementById('task_description').value = data.task.task_description;
+				document.getElementById('task_deadline').value = data.task.task_deadline;
+				document.getElementById('priority_'+data.task.task_priority).checked = true;
+				document.getElementById('task_status_'+data.task.task_status).checked = true;
 				clearSelect('task_categories');
 				var selected = [];
-				for (category in data.task_categories) {
-					selected[data.task_categories[category].category_id] = true;
+				for (category in data.task.task_categories) {
+					selected[data.task.task_categories[category].category_id] = true;
 				}
-				for(category in categories) {
+				for(category in data.categories) {
 					var new_option = document.createElement('option');
-					new_option.text = categories[category].category_name;
-					new_option.value = categories[category].category_id;
-					if (selected[categories[category].category_id]) {
+					new_option.text = data.categories[category].category_name;
+					new_option.value = data.categories[category].category_id;
+					if (selected[data.categories[category].category_id]) {
 						new_option.selected = true;
 					}
 					try {
@@ -288,18 +280,24 @@ function getCategoryList() {
 		if (xmlhttp.readyState==4) {
 			if (xmlhttp.status==200) {
 				//console.log(jsonParse(xmlhttp.responseText));
-				categories = jsonParse(xmlhttp.responseText).result;
+				var categories = jsonParse(xmlhttp.responseText).result;
 				clearSelect('filter_categories');
+				clearSelect('task_categories');
 				document.getElementById('category_list_items').innerHTML = '';
 				for(category in categories) {
 					var new_option = document.createElement('option');
 					new_option.text = categories[category].category_name;
 					new_option.value = categories[category].category_id;
+					var new_option2 = document.createElement('option');
+					new_option2.text = categories[category].category_name;
+					new_option2.value = categories[category].category_id;
 					try {
 						document.getElementById('filter_categories').add(new_option, null);
+						document.getElementById('task_categories').add(new_option2, null);
 					}
 					catch(ex) {
 						document.getElementById('filter_categories').add(new_option);
+						document.getElementById('task_categories').add(new_option2);
 					}
 					var new_list_item = document.createElement('div');
 					new_list_item.className = 'list_item';
@@ -316,4 +314,5 @@ function getCategoryList() {
 	xmlhttp.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
 	xmlhttp.setRequestHeader('Cache-Control', 'no-cache, must-revalidate');
 	xmlhttp.send();
+	document.getElementById('category_list_items').innerHTML = 'Loading...';
 }

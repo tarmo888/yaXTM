@@ -62,7 +62,7 @@ class api extends framework {
 		}
 		else {
 			$task = new task($_GET['id']);
-			return $task;
+			return array('task' => $task, 'categories' => $this->category_list());
 		}
 	}
 
