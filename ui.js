@@ -124,7 +124,6 @@ function postTask() {
 		if (xmlhttp.readyState==4) {
 			if (xmlhttp.status==200) {
 				//console.log(jsonParse(xmlhttp.responseText));
-				getTaskList();
 				location.hash = 'task_list';
 				document.getElementById('save_task').disabled = false;
 			}
