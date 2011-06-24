@@ -85,15 +85,11 @@ function hashHandler() {
 	default:
 		if (layer.substring(0, 5) == 'task=') {
 			var layer_parts = layer.split('=');
-			if (layer_parts.length > 1) {
-				loadTask(layer_parts[1]);
-			}
+			loadTask(layer_parts[1]);
 		}
 		else if (layer.substring(0, 9) == 'category=') {
 			var layer_parts = layer.split('=');
-			if (layer_parts.length > 1) {
-				loadCategory(layer_parts[1]);
-			}
+			loadCategory(layer_parts[1]);
 		}
 		else {
 			window.location.replace('#task_list');
@@ -282,6 +278,7 @@ function getCategoryList() {
 				//console.log(jsonParse(xmlhttp.responseText));
 				var categories = jsonParse(xmlhttp.responseText).result;
 				clearSelect('filter_categories');
+				list_categories = '';
 				clearSelect('task_categories');
 				document.getElementById('category_list_items').innerHTML = '';
 				for(category in categories) {
